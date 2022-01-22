@@ -47,7 +47,7 @@ const int door_statusLed = DOOR_STATUS_LED;
 const int relayActiveTime = 500;
 int door_lastStatusValue = 2;
 unsigned long door_lastSwitchTime = 0;
-int debounceTime = 2000;
+unsigned int debounceTime = 2000;
 
 String availabilityBase = MQTT_CLIENTID;
 String availabilitySuffix = "/availability";
@@ -63,7 +63,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-  for (int i = 0; i < length; i++) {
+  for (unsigned int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
   Serial.println();
@@ -95,7 +95,7 @@ void publish_door_status() {
 void check_door_status() {
   int currentStatusValue = digitalRead(door_statusPin);
   if (currentStatusValue != door_lastStatusValue) {
-    unsigned int currentTime = millis();
+    unsigned long currentTime = millis();
     if (currentTime - door_lastSwitchTime >= debounceTime) {
       publish_door_status();
       door_lastStatusValue = currentStatusValue;
@@ -129,7 +129,6 @@ void toggleRelay(int pin) {
 }
 
 void triggerDoorAction(String requestedDoor, String requestedAction) {
-  int currentStatusValue = digitalRead(door_statusPin);
   if (requestedDoor == mqtt_door_action_topic && requestedAction == "OPEN") {
     Serial.print("Triggering ");
     Serial.print(door_alias);
