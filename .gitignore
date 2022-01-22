@@ -1,0 +1,3 @@
+target/*
+src/*.cpp
+src/secrets.h
