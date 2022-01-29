@@ -1,3 +1,4 @@
 target/*
 src/*.cpp
 src/secrets.h
+.vscode/c_cpp_properties.json

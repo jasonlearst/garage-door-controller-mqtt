@@ -9,6 +9,15 @@
 #include "MQTT.h"
 #include "secrets.h"
 
+// Debug
+#ifdef DEBUG
+  #define DEBUG_PRINTLN(x)  Serial.println (x)
+  #define DEBUG_PRINT(x)    Serial.print (x)
+#else
+  #define DEBUG_PRINTLN(x)
+  #define DEBUG_PRINT(x)
+#endif
+
 // MQTT Parameter
 #define MQTT_BROKER SECRET_MQTT_BROKER
 #define MQTT_CLIENTID "garage-cover"
@@ -60,13 +69,13 @@ MQTT client(mqtt_broker, 1883, callback);
 
 // Callback when MQTT message is received; calls triggerDoorAction(), passing topic and payload as parameters
 void callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
+  DEBUG_PRINT("Message arrived [");
+  DEBUG_PRINT(topic);
+  DEBUG_PRINT("] ");
   for (unsigned int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
+    DEBUG_PRINT((char)payload[i]);
   }
-  Serial.println();
+  DEBUG_PRINTLN();
   String topicToProcess = topic;
   payload[length] = '\0';
   String payloadToProcess = (char*)payload;
@@ -76,17 +85,17 @@ void callback(char* topic, byte* payload, unsigned int length) {
 // Functions that check door status and publish an update when called
 void publish_door_status() {
   if (digitalRead(door_statusPin) == LOW) {
-      Serial.print(door_alias);
-      Serial.print(" closed! Publishing to ");
-      Serial.print(mqtt_door_status_topic);
-      Serial.println("...");
+      DEBUG_PRINT(door_alias);
+      DEBUG_PRINT(" closed! Publishing to ");
+      DEBUG_PRINT(mqtt_door_status_topic);
+      DEBUG_PRINTLN("...");
       client.publish(mqtt_door_status_topic, "closed", true);
   }
   else {
-      Serial.print(door_alias);
-      Serial.print(" open! Publishing to ");
-      Serial.print(mqtt_door_status_topic);
-      Serial.println("...");
+      DEBUG_PRINT(door_alias);
+      DEBUG_PRINT(" open! Publishing to ");
+      DEBUG_PRINT(mqtt_door_status_topic);
+      DEBUG_PRINTLN("...");
       client.publish(mqtt_door_status_topic, "open", true);
   }
 }
@@ -106,11 +115,11 @@ void check_door_status() {
 
 // Function that publishes birthMessage
 void publish_birth_message() {
-  Serial.print("Publishing birth message \"");
-  Serial.print(birthMessage);
-  Serial.print("\" to ");
-  Serial.print(availabilityTopic);
-  Serial.println("...");
+  DEBUG_PRINT("Publishing birth message \"");
+  DEBUG_PRINT(birthMessage);
+  DEBUG_PRINT("\" to ");
+  DEBUG_PRINT(availabilityTopic);
+  DEBUG_PRINTLN("...");
   client.publish(availabilityTopic, birthMessage, true);
 }
 
@@ -130,25 +139,25 @@ void toggleRelay(int pin) {
 
 void triggerDoorAction(String requestedDoor, String requestedAction) {
   if (requestedDoor == mqtt_door_action_topic && requestedAction == "OPEN") {
-    Serial.print("Triggering ");
-    Serial.print(door_alias);
-    Serial.println(" OPEN relay!");
+    DEBUG_PRINT("Triggering ");
+    DEBUG_PRINT(door_alias);
+    DEBUG_PRINTLN(" OPEN relay!");
     toggleRelay(door_openPin);
   }
   else if (requestedDoor == mqtt_door_action_topic && requestedAction == "CLOSE" ) {
-    Serial.print("Triggering ");
-    Serial.print(door_alias);
-    Serial.println(" CLOSE relay!");
+    DEBUG_PRINT("Triggering ");
+    DEBUG_PRINT(door_alias);
+    DEBUG_PRINTLN(" CLOSE relay!");
     toggleRelay(door_closePin);
   }
   else if (requestedDoor == mqtt_door_action_topic && requestedAction == "STATE") {
-    Serial.print("Publishing on-demand status update for ");
-    Serial.print(door_alias);
-    Serial.println("!");
+    DEBUG_PRINT("Publishing on-demand status update for ");
+    DEBUG_PRINT(door_alias);
+    DEBUG_PRINTLN("!");
     publish_birth_message();
     publish_door_status();
   }
-  else { Serial.println("taking no action!");
+  else { DEBUG_PRINTLN("taking no action!");
   }
 }
 
@@ -156,23 +165,23 @@ void triggerDoorAction(String requestedDoor, String requestedAction) {
 void reconnect() {
   // Loop until we're reconnected
   while (!client.isConnected()) {
-    Serial.print("Attempting MQTT connection...");
+    DEBUG_PRINT("Attempting MQTT connection...");
     // Attempt to connect
     if (client.connect(mqtt_clientId, mqtt_username, mqtt_password, availabilityTopic, MQTT::EMQTT_QOS::QOS0, 1, lwtMessage, true)) {
-      Serial.println("Connected!");
+      DEBUG_PRINTLN("Connected!");
       publish_birth_message();
       // Subscribe to the action topics to listen for action messages
-      Serial.print("Subscribing to ");
-      Serial.print(mqtt_door_action_topic);
-      Serial.println("...");
+      DEBUG_PRINT("Subscribing to ");
+      DEBUG_PRINT(mqtt_door_action_topic);
+      DEBUG_PRINTLN("...");
       client.subscribe(mqtt_door_action_topic);
 
       // Publish the current door status on connect/reconnect to ensure status is synced with whatever happened while disconnected
       publish_door_status();
     } 
     else {
-      Serial.print("failed, rc=");
-      Serial.println(" try again in 5 seconds");
+      DEBUG_PRINT("failed, rc=");
+      DEBUG_PRINTLN(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);
     }
@@ -199,13 +208,13 @@ void setup() {
   door_lastStatusValue = digitalRead(door_statusPin);
 
   Serial.begin(115200);
-  Serial.println("Starting GarHAge...");
+  DEBUG_PRINTLN("Starting GarHAge...");
 
   if (activeHighRelay) {
-    Serial.println("Relay mode: Active-High");
+    DEBUG_PRINTLN("Relay mode: Active-High");
   }
   else {
-    Serial.println("Relay mode: Active-Low");
+    DEBUG_PRINTLN("Relay mode: Active-Low");
   }
 }
 
