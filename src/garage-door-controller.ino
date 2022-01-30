@@ -113,6 +113,16 @@ void check_door_status() {
   }
 }
 
+// Function that returns a boolean state of the door
+bool doorIsOpen() {
+  if(door_lastStatusValue == LOW) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
+
 // Function that publishes birthMessage
 void publish_birth_message() {
   DEBUG_PRINT("Publishing birth message \"");
@@ -138,13 +148,13 @@ void toggleRelay(int pin) {
 }
 
 void triggerDoorAction(String requestedDoor, String requestedAction) {
-  if (requestedDoor == mqtt_door_action_topic && requestedAction == "OPEN") {
+  if (requestedDoor == mqtt_door_action_topic && requestedAction == "OPEN" && !doorIsOpen()) {
     DEBUG_PRINT("Triggering ");
     DEBUG_PRINT(door_alias);
     DEBUG_PRINTLN(" OPEN relay!");
     toggleRelay(door_openPin);
   }
-  else if (requestedDoor == mqtt_door_action_topic && requestedAction == "CLOSE" ) {
+  else if (requestedDoor == mqtt_door_action_topic && requestedAction == "CLOSE" && doorIsOpen()) {
     DEBUG_PRINT("Triggering ");
     DEBUG_PRINT(door_alias);
     DEBUG_PRINTLN(" CLOSE relay!");
