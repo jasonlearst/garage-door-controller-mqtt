@@ -1,10 +1,27 @@
-# garage-door-controller
+# MQTT Garage Door Controller
 
-A Particle project named garage-door-controller
+This repository contains the source code for a MQTT Garage Door Controller built on the Particle Photon controller.
 
-## Welcome to your project!
+## Reusing this implementation
 
-Every new Particle project is composed of 3 important elements that you'll see have been created in your project directory for garage-door-controller.
+Rename the ```_secrets.h``` template to ```secrets.h``` by removing the leading underscore.  Fill in the correct information for your MQTT broker.  Add the code contained in ```configuration.yml``` to your Home Assistant configuration to connect Home Assistant to the controller.
+
+```yaml
+cover:
+  - platform: mqtt
+    name: "garage"
+    device_class: garage
+    state_topic: "garage-cover/door/status"
+    command_topic: "garage-cover/door/action"
+    availability_topic: "garage-cover/availability"
+```
+
+## Inspiration for this project
+
+This code is adapted from the instructables guide [DIY Smart Garage Door Opener + Home Assistant Integration](https://www.instructables.com/DIY-Smart-Garage-Door-Opener-Using-ESP8266-Wemos-D/).  You can find the original authors code at [https://gitlab.com/MrDIYca/garage-door-opener-mqtt](https://gitlab.com/MrDIYca/garage-door-opener-mqtt).
+# Instructions for using the Particle Visual Studio Code plugin
+
+Every new Particle project is composed of 3 important elements that you'll see have been created in your project directory.
 
 #### ```/src``` folder:  
 This is the source folder that contains the firmware files for your project. It should *not* be renamed. 
