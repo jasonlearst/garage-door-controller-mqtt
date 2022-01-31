@@ -2,7 +2,7 @@
 
 This repository contains the source code for a MQTT Garage Door Controller built on the Particle Photon controller.
 
-## Reusing this implementation
+## Using this implementation
 
 Rename the ```_secrets.h``` template to ```secrets.h``` by removing the leading underscore.  Fill in the correct information for your MQTT broker.  Add the code contained in ```configuration.yml``` to your Home Assistant configuration to connect Home Assistant to the controller.
 
